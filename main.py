@@ -5,6 +5,11 @@ from pinecone import Pinecone
 from langchain_google_genai.embeddings import GoogleGenerativeAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from langchain_community.tools import DuckDuckGoSearchRun
+import google.generativeai as genai
+from PIL import Image
+from st_multimodal_chatinput import multimodal_chatinput
+import base64,io
+
 import streamlit as st
 
 st.set_page_config(page_title="Bhala Manus", page_icon="🌟")
@@ -53,27 +58,40 @@ st.markdown('<div class="header">🌟No Back Abhiyan </div>', unsafe_allow_html=
 st.markdown('<p style="color: #dcfa2f; font-size: 18px; text-align: center;">Padh le yaar...</p>', unsafe_allow_html=True)
 
 # Sidebar and configuration
-st.sidebar.markdown(
-    """<h3 style="color: cyan;">Configuration</h3>""", 
-    unsafe_allow_html=True
-)
+st.sidebar.markdown("""<h3 style="color: cyan;">Configuration</h3>""", unsafe_allow_html=True)
 index_name = st.sidebar.text_input("Doc Name", value="ml-docs", help="Enter the name of the index to use.")
 groq_api_key = st.sidebar.text_input("LLM API Key", type="password", help="Enter your groq API key.")
 
 if not groq_api_key:
     st.sidebar.markdown("<p style='color: #f44336;'>Please enter the LLM API key to proceed!</p>", unsafe_allow_html=True)
 
-with st.sidebar:
-    col1, col2 = st.columns(2)
-    with col1:
-        use_vector_store = st.checkbox("Use Documents", value=True)
-    with col2:
-        use_chat_history = st.checkbox("Use Chat History (Last 2 Chats)", value=False)
+
 
 use_web = st.sidebar.checkbox("Allow Internet Access", value=True)
+use_vector_store = st.sidebar.checkbox("Use Documents", value=True)
+use_chat_history = st.sidebar.checkbox("Use Chat History (Last 2 Chats)", value=False)
 
 if use_chat_history:
     use_vector_store, use_web = False, False
+
+
+def img_to_ques(img,query):
+    genai.configure(api_key="AIzaSyBGMk5yhUdGv-Ph5P6Y5rq7F3G56GQJbaw")
+    model = genai.GenerativeModel("gemini-1.5-flash-8b")
+    prompt = f"""Analyze the provided image and the query: "{query}". Based on the content of the image:
+1. Extract or generate a question that aligns with the given query.
+2. Identify and provide any relevant information or insights from the image that could help address or solve the problem described in the query.
+
+Format your response as follows:
+
+Question:  
+[Generated question based on the image and query]  
+
+Relevant Information:  
+**optional, only if there are any**
+[Key details or insights from the image that are relevant to solving the problem]
+"""
+    return model.generate_content([prompt, img]).text
 
 # Instructions
 st.sidebar.markdown("""
@@ -245,13 +263,21 @@ def respond_to_user(query, context, llm):
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-display_chat_history()
 if groq_api_key:
-    if input_data := st.chat_input():
-        st.session_state.messages.append({"role": "user", "content": input_data})
-        context = get_context(input_data)
+    with st.container():
+        user_inp = multimodal_chatinput()
+    if user_inp:
+        question=""
+        if user_inp["images"]:
+            b64_image=user_inp["images"][0].split(",")[-1]
+            image = Image.open(io.BytesIO(base64.b64decode(b64_image)))
+            question = img_to_ques(image, user_inp["text"])
+            user_inp["text"]=""
+
+        st.session_state.messages.append({"role": "user", "content": question+user_inp["text"]})
+        context = get_context(question+user_inp["text"])
         with st.spinner(":green[Combining jhol jhal...]"):
-            assistant_response = respond_to_user(input_data, context, llm)
+            assistant_response = respond_to_user(question+user_inp["text"], context, llm)
         st.session_state.messages.append({"role": "assistant", "content": assistant_response})
 
         display_chat_history()
