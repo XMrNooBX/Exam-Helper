@@ -176,6 +176,7 @@ def get_llm_data(query, llm):
         - Use examples, analogies, or step-by-step explanations to clarify ideas.
         - Ensure your answers are accurate, well-structured, and easy to follow.
         - If you don’t know the answer, acknowledge it and suggest ways to explore or research further.
+        - Always give calculation wherever needed and reply in proper markdown format
     """
 
     user = """{query}
