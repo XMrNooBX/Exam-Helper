@@ -146,7 +146,7 @@ st.sidebar.markdown(
     """<h3 style="color: cyan;">Configuration</h3>""", unsafe_allow_html=True
 )
 index_name = st.sidebar.selectbox(
-    "Doc Name", options=["cc-docs","ann-docs", "dbms-docs"], index=0, help="Select the name of the Documents to use."
+    "Doc Name", options=["os-docs"], index=0, help="Select the name of the Documents to use."
 )
 groq_api_key = st.sidebar.text_input(
     "LLM API Key", type="password", help="Enter your groq API key."
@@ -193,7 +193,7 @@ Kheliye *meating - meeting*
 
 # API keys for various services
 api_keys = {
-    "pinecone": "pcsk_6KAu86_9Zzepx9S1VcDmLRmBSUUNpPf4JRbE4BaoVmk36yW9R4nkjutPiZ3AjZvcyL4MVx",
+    "pinecone": "pcsk_7T5yD_5dUhax1xCeRv6Tm1MdiDpBkGTpv41tcUzsH2VG671YW2gFaQYcGqF57QY3BFZWn",
     "google": "AIzaSyARa0MF9xC5YvKWnGCEVI4Rgp0LByvYpHw",
     "groq": groq_api_key,
 }
