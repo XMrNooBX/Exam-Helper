@@ -28,34 +28,86 @@ def get_llm(model, api_keys):
     return ChatGroq(temperature=0.2, model=model, api_key=api_keys["groq"])
 
 def clean_rag_data(query, context, llm):
-    """Cleans and filters RAG data based on the query."""
+    """Cleans and filters RAG data based on the query, prioritizing relevance, accuracy, and conciseness."""
     system = """
-        You are a Highly capable Proffesor of understanding the value and context of both user queries and given data. 
-        Your Task for Documents Data is to analyze the list of document's content and properties and find the most important information regarding user's query.
-        Your Task for ChatHistory Data is to analyze the given ChatHistory and then provide a ChatHistory relevant to user's query.
-        Your Task for Web Data is to analyze the web scraped data then summarize only useful data regarding user's query.
-        You Must adhere to User's query before answering.
-        
-        Output:
-            For Document Data
-                Conclusion:
-                    ...
-            For ChatHistory Data
-                    User: ...
-                    ...
-                    Assistant: ...
-            For Web Data
-                Web Scarped Data:
-                ...
+        You are a highly capable research assistant specializing in information retrieval and summarization. 
+        Your task is to analyze the provided data (Documents, Chat History, or Web Data) and extract information that is most relevant to the user's query.
+
+        **Criteria for Importance**:
+            1. **Relevance**: The information must directly address the user's query, focusing on keywords, concepts, and the user's intent.
+            2. **Accuracy**:  Prioritize information that is factually correct and verifiable, especially for Web Data. If sources disagree, state the different viewpoints.
+            3. **Conciseness**:  Summarize information efficiently, avoiding redundancy. If multiple sources provide similar information, select the most comprehensive and well-explained version.
+            4. **Completeness**: Aim to provide a complete answer to the query to the best extent possible from the given data.
+
+        **Data Type Specific Instructions**:
+
+        **Documents Data**:
+            - Analyze document content, title, source, and date (if available).
+            - Extract relevant passages that directly answer the user's query or summarize the document's main points in relation to the query.
+            - If multiple documents are relevant, rank them in order of relevance and provide a combined summary.
+        **Output Format (Documents Data):**
+            ```json
+            {
+                "Conclusion": "<Summarized answer synthesized from relevant documents>",
+                "Relevant Documents": [
+                    {
+                        "Document ID": "<document identifier>",
+                        "Snippet": "<Extracted passage>",
+                        "Source": "<Source of the document>" 
+                    },
+                    // ... more documents if applicable
+                ]
+            }
+            ```
+
+        **ChatHistory Data**:
+            - Analyze the last 5 turns of the conversation.
+            - Focus on turns directly related to the current query, but also consider the broader conversational context.
+            - If information has changed during the chat, provide the most recent and relevant information.
+        **Output Format (ChatHistory Data):**
+            ```json
+            {
+                "Relevant Chat Turns": [
+                    {"User": "<User utterance>"},
+                    {"Assistant": "<Assistant response>"},
+                    // ... more turns if applicable
+                ]
+            }
+            ```
+
+        **Web Data**:
+            - Summarize the web scraped data, extracting key facts, statistics, or arguments that directly relate to the user's query.
+            - Prioritize information from reputable sources.
+            - Remove irrelevant content like ads or unrelated sections.
+            - Provide the source URL for each piece of summarized information.
+        **Output Format (Web Data):**
+            ```json
+            {
+                "Web Scraped Data": [
+                    {
+                        "Summary": "<Summarized information from a web page>",
+                        "URL": "<Source URL>"
+                    },
+                    // ... more web data if applicable
+                ]
+            }
+            ```
+
+        **Error Handling**:
+            - If no relevant information is found for a particular data type, output `{"<Data Type>": "No relevant information found."}`.
+            - If the query is ambiguous, output `{"Error": "Ambiguous query. Please provide more context or be more specific."}`.
     """
-    user = """{context}
-            User's query is given below:
+    user = """
+            Data:
+            {context}
+
+            User's query:
             {question}
     """
     filtering_prompt = ChatPromptTemplate.from_messages(
         [("system", system), ("user", user)]
     )
-    filtering_chain = filtering_prompt | llm | StrOutputParser()
+    filtering_chain = filtering_prompt | llm | StrOutputParser()  # Consider using a structured output parser if needed
     return filtering_chain.invoke({"context": context, "question": query})
 
 def get_llm_data(query, llm):
