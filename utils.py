@@ -129,7 +129,7 @@ When processing a query, your responsibilities are as follows:
     filtering_chain = filtering_prompt | llm | StrOutputParser()
     return filtering_chain.invoke({"query": query})
 
-def get_context(query, use_vector_store,vector_store, use_web, use_chat_history, llm, llmx, messages):
+def get_context(query, use_vector_store,vector_store, use_web, use_chat_history, llm, llmx, messages, subject):
     """Retrieves and processes context from various sources."""
     context = ""
     if use_vector_store:
@@ -162,7 +162,7 @@ def get_context(query, use_vector_store,vector_store, use_web, use_chat_history,
 
     if not use_chat_history:
         with st.spinner(":green[Extracting Data From ChatPPT...]"):
-            context += f"\n\n LLM Data {get_llm_data(query, llm)}"
+            context += f"\n\n LLM Data {get_llm_data(query, llm, subject)}"
 
     return context
 
