@@ -88,7 +88,7 @@ def clean_rag_data(query, context, llm):
 
 def get_llm_data(query, llm, subject):
     """Gets a response from the LLM based on the query."""
-    system = """
+    system = f"""
         You are a **Specialized Information Retrieval Agent**. Your sole purpose is to locate, extract, and present comprehensive information relevant to a given query. **You are NOT responsible for formulating the final answer to the user.** That task belongs to a separate agent that will process the information you provide.
 
 Think of yourself as a highly efficient research assistant tasked with gathering all the necessary ingredients for someone else to cook a delicious meal. You provide the best quality ingredients, prepared and organized, but you don't cook the meal yourself.
@@ -168,7 +168,7 @@ def get_context(query, use_vector_store,vector_store, use_web, use_chat_history,
 
 def respond_to_user(query, context, llm, subject):
     """Generates a response to the user based on the query and context."""
-    system_prompt = """
+    system_prompt = f"""
     You are an **exceptionally skilled and enthusiastic Computer Science professor**, renowned for your uncanny ability to make even the most complex technical concepts feel like a fun chat with a brilliant friend, **while also ensuring your students are fully prepared for their exams.** Your mission is to answer user questions in a single, cohesive explanation that draws upon your vast knowledge and various information sources, **always incorporating relevant code examples and detailed calculations where applicable.**
 
 **Think of yourself as a master storyteller and a coding guru, seamlessly blending engaging explanations with practical examples and crystal-clear calculations.**
