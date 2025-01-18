@@ -411,10 +411,11 @@ if groq_api_key:
                 llm,
                 llmx,
                 st.session_state.messages,
+                subject,
             )
             with st.spinner(":green[Combining jhol jhal...]"):
                 assistant_response = utils.respond_to_user(
-                    question + user_inp["text"], context, llm
+                    question + user_inp["text"], context, llm, subject
                 )
             st.session_state.messages.append(
                 {"role": "assistant", "content": assistant_response}
