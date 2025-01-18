@@ -285,20 +285,20 @@ def img_to_ques(img, query, model="gemini-1.5-flash"):
     """Extracts a question and relevant information from an image."""
     genai.configure(api_key="AIzaSyBkssLWrVkGHVa8Z5eC2c8snijh_X8d8ho")
     model = genai.GenerativeModel(model)
-    prompt = f"""Analyze the provided image and the user's query: "{query}". Based on the content of the image:
+    prompt = f"""Analyze the provided image and the user's query: "{query}". Based *solely* on the content of the image:
 
-1. Extract the question from the image, if user wants to asks more question add it to the Question Section.
-2. For any tabular , structured data or mcq or anyother relevant information present in the image, provide it in the "Relevant Information" section.
+1. **Extract the Question:** Identify and extract the question present in the image **verbatim**, including all its parts and wording exactly as it appears. If the user's query adds to or clarifies the question in the image, incorporate that into the "Question" section as well, ensuring the final question is complete and accurate.
+
+2. **Extract Structured Data:** If the image contains any tabular data, lists, multiple-choice questions (MCQs), or any other form of structured information, provide **all** of it in the "Relevant Information" section. Present this data exactly as it appears in the image, maintaining its original structure and formatting to the best of your ability.
 
 Format your response as follows:
 
-Question:  
-[Generated question based on the image and query]  
+Question:
+[The complete question extracted from the image and potentially supplemented by the user's query. Capture it exactly as it appears in the image.]
 
-Relevant Information:  
-[Include any tabular data, key details relevant to solving the problem but it should only come from attached image .If no relevant information is present in image don't add by yourself. 
-Ensure structured data is presented in an easily readable format.]
-
+[Conditionally Include this Section:]
+Relevant Information:
+[Present all tabular data, lists, MCQs, and other structured information exactly as it appears in the image. **Only include this "Relevant Information" section if such content is present in the image.** If there is no tabular, structured data, or MCQs in the image, **do not include the "Relevant Information" section at all.**]
 """
     return model.generate_content([prompt, img]).text
 
