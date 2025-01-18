@@ -225,7 +225,6 @@ st.markdown('<p class="subheader">Padh le yaar...</p>', unsafe_allow_html=True)
 with st.sidebar:
     st.markdown('<h3 style="color: #00ffff;">Configuration</h3>', unsafe_allow_html=True)
     index_name = st.selectbox("Doc Name", options=["r-docs","toc-book"], index=0, help="Select the name of the Documents to use.")
-    subject = index_name.split('-')[0]
     groq_api_key = st.text_input("LLM API Key", type="password", help="Enter your groq API key.")
     model = st.selectbox(
         "Select Model",
@@ -267,7 +266,7 @@ api_keys = {
     "google": "AIzaSyARa0MF9xC5YvKWnGCEVI4Rgp0LByvYpHw",
     "groq": groq_api_key,
 }
-
+subject = index_name.split('-')[0]
 # --- Initialize Session State ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -381,8 +380,6 @@ if groq_api_key:
                         images=""
                 if images:
                    carousel(images, fade=True, wrap=True, interval=999000)
-        else:
-            st.info("No Diagram Required For This Query")
         with st.spinner(":green[Processing Youtube Video]"):
             if video_id:
                 st.success(
