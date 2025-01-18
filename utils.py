@@ -25,7 +25,7 @@ def get_vector_store(index_name, api_keys):
 
 def get_llm(model, api_keys):
     """Initializes and returns a ChatGroq language model."""
-    return ChatGroq(temperature=0.2, model=model, api_key=api_keys["groq"])
+    return ChatGroq(temperature=1, model=model, api_key=api_keys["groq"])
 
 def clean_rag_data(query, context, llm):
     """Cleans and filters RAG data based on the query."""
