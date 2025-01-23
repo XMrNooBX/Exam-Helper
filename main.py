@@ -309,7 +309,7 @@ if "api_key" in st.session_state and "model" in st.session_state:
 llmx = ChatMistralAI(
     model="mistral-large-latest",
     temperature=0.3,
-    api_key="RScM7WQKY4RtCVOOj49MWYqRVQB3zl9Y",
+    api_key="fCf6gpwY6D3Z2mJlHAHxcg4xhp6f6Xcz",
 )
 
 # --- Function to Display Chat History ---
