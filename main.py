@@ -224,7 +224,7 @@ st.markdown('<p class="subheader">Padh le yaar...</p>', unsafe_allow_html=True)
 # --- Sidebar Configuration ---
 with st.sidebar:
     st.markdown('<h3 style="color: #00ffff;">Configuration</h3>', unsafe_allow_html=True)
-    index_name = st.selectbox("Doc Name", options=["r-docs","toc-book"], index=0, help="Select the name of the Documents to use.")
+    index_name = st.selectbox("Doc Name", options=["ai-docs"], index=0, help="Select the name of the Documents to use.")
     groq_api_key = st.text_input("LLM API Key", type="password", help="Enter your groq API key.")
     model = st.selectbox(
         "Select Model",
